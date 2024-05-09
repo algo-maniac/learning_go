@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+// const variables cannot be changed later
+// Also they start with capital letter by convention
+const GlobalVariable = "I am global"
+
 func main() {
 	// fmt.Println("Hello World!!")
 
