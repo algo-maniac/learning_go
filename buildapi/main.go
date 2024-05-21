@@ -25,6 +25,21 @@ type Author struct {
 	Website  string `json:"website"`
 }
 
+// Response messages
+
+type ControllerResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+// Constructor function to create a Success instance with default values
+func NewControllerResponse(statusCode int, message string) ControllerResponse {
+	return ControllerResponse{
+		Status:  statusCode, // Default status code
+		Message: message,    // Default message
+	}
+}
+
 // Database
 
 var courses []Course
@@ -50,7 +65,13 @@ func getAllCourses(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(courses)
 
-	json.NewEncoder(w).Encode(courses)
+	if len(courses) == 0 {
+		response := NewControllerResponse(400, "No courses found")
+		json.NewEncoder(w).Encode(response)
+	} else {
+		json.NewEncoder(w).Encode(courses)
+	}
+
 }
 
 // get a course
@@ -71,7 +92,9 @@ func getOneCourse(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	json.NewEncoder(w).Encode("No course found with the given id")
+	response := NewControllerResponse(400, `No courses found with given id`)
+	json.NewEncoder(w).Encode(response)
+
 }
 
 // create a course
@@ -83,7 +106,8 @@ func createOneCourse(w http.ResponseWriter, r *http.Request) {
 	// if body is empty
 
 	if r.Body == nil {
-		json.NewEncoder(w).Encode("Please send some data")
+		response := NewControllerResponse(400, `Please send some data`)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
@@ -91,7 +115,8 @@ func createOneCourse(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&course)
 	if course.IsEmpty() {
-		json.NewEncoder(w).Encode("No data inside the json")
+		response := NewControllerResponse(400, `No data inside json`)
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 
@@ -126,7 +151,8 @@ func updateOneCourse(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	json.NewEncoder(w).Encode("Id not matched")
+	response := NewControllerResponse(400, `Id not matched`)
+	json.NewEncoder(w).Encode(response)
 
 }
 
@@ -146,7 +172,8 @@ func deleteOneCourse(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	json.NewEncoder(w).Encode("Id not matched")
+	response := NewControllerResponse(400, `Id not matched`)
+	json.NewEncoder(w).Encode(response)
 }
 
 func main() {
